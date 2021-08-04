@@ -43,7 +43,7 @@ def clean_listings_data(listings_data, num_accomodates, num_bedrooms, max_price)
     listings_data = listings_data[columns_needed]
 
     # Change price from str to float
-    listings_data['price'] = listings_data['price'].apply(lambda x: float(x.replace('$','')))
+    listings_data['price'] = listings_data['price'].apply(lambda x: float(x.replace('$','').replace(',','')))
 
     #filter based on accomodates, bedrooms and price requirements
     listings_data = listings_data.loc[(listings_data['price'] <= max_price) & (listings_data['accommodates'] >= num_accomodates) & (listings_data['bedrooms'] >= num_bedrooms)]
