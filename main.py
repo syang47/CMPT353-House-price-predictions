@@ -42,11 +42,19 @@ def clean_listings_data(listings_data, num_accomodates, num_bedrooms, max_price)
     columns_needed = ['id', 'listing_url', 'name', 'description', 'picture_url', 'latitude', 'longitude', 'property_type', 'accommodates', 'bedrooms', 'beds', 'amenities', 'price']
     listings_data = listings_data[columns_needed]
 
+    pd.set_option('mode.chained_assignment', None)
+
     # Change price from str to float
     listings_data['price'] = listings_data['price'].apply(lambda x: float(x.replace('$','').replace(',','')))
 
     #filter based on accomodates, bedrooms and price requirements
     listings_data = listings_data.loc[(listings_data['price'] <= max_price) & (listings_data['accommodates'] >= num_accomodates) & (listings_data['bedrooms'] >= num_bedrooms)]
+
+    if listings_data.empty:
+        print("\nNo listings found with current filters, Change the filters and Try Again!!\n")
+        exit()
+
+    listings_data.reset_index(drop = True , inplace = True)
 
     return listings_data
 
@@ -69,10 +77,10 @@ def main():
     # Change amenities here (updated the "restaurant" typo)
     amenities_required = ['restaurant', 'fast_food', 'cafe','bank','atm','pharmacy','bicycle_rental','fuel','pub','bar','car_sharing','car_rental','clinic','doctors','hospital','ice_cream','fountain','theatre','police','bus_station']
 
-    # TODO:turn this into user input in the end
-    num_accomodates = 4
-    num_bedrooms = 2
-    max_price = 200 
+    # TODO:turn this into user input in the end 
+    num_accomodates = 10
+    num_bedrooms = 3
+    max_price = 300 
 
     #Data Cleaning
     amenities_data_clean = clean_amenities_data(amenities_data, amenities_required)
