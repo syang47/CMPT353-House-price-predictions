@@ -37,10 +37,17 @@ def haversine_distance(df, lon2, lat2):
     r = 6371 # Radius of earth in kilometers. Use 3956 for miles
     return c * r * 1000
 
-def clean_listings_data(listings_data):
+def clean_listings_data(listings_data, num_accomodates, num_bedrooms, max_price):
     #keep only the columns we need
     columns_needed = ['id', 'listing_url', 'name', 'description', 'picture_url', 'latitude', 'longitude', 'property_type', 'accommodates', 'bedrooms', 'beds', 'amenities', 'price']
     listings_data = listings_data[columns_needed]
+
+    # Change price from str to float
+    listings_data['price'] = listings_data['price'].apply(lambda x: float(x.replace('$','')))
+
+    #filter based on accomodates, bedrooms and price requirements
+    listings_data = listings_data.loc[(listings_data['price'] <= max_price) & (listings_data['accommodates'] >= num_accomodates) & (listings_data['bedrooms'] >= num_bedrooms)]
+
     return listings_data
 
 
@@ -62,9 +69,14 @@ def main():
     # Change amenities here (updated the "restaurant" typo)
     amenities_required = ['restaurant', 'fast_food', 'cafe','bank','atm','pharmacy','bicycle_rental','fuel','pub','bar','car_sharing','car_rental','clinic','doctors','hospital','ice_cream','fountain','theatre','police','bus_station']
 
+    # TODO:turn this into user input in the end
+    num_accomodates = 4
+    num_bedrooms = 2
+    max_price = 200 
+
     #Data Cleaning
     amenities_data_clean = clean_amenities_data(amenities_data, amenities_required)
-    listings_data_clean = clean_listings_data(listings_data)
+    listings_data_clean = clean_listings_data(listings_data,num_accomodates,num_bedrooms,max_price)
 
     #add a column for number of amenities nearby to each listing
     listings_data_clean['num_amenities_nearby'] = listings_data_clean.apply(lambda x: num_amenities(x['latitude'], x['longitude'], amenities_data_clean), axis = 1)
