@@ -69,6 +69,18 @@ def num_amenities(lat, lon, amenities_data_clean):
     return amenities_dict
     
 
+def ameneties_score(my_dict):
+    
+    num_different_amenities = len(my_dict)
+    score = num_different_amenities * 10 
+        
+    for key in my_dict:
+        if (my_dict[key] > 30):
+            score+=30
+        else:
+            score+= my_dict[key]
+    return score
+
 def main():
 
     #Read Data
@@ -88,6 +100,12 @@ def main():
 
     #add a column for number of amenities nearby to each listing
     listings_data_clean['num_amenities_nearby'] = listings_data_clean.apply(lambda x: num_amenities(x['latitude'], x['longitude'], amenities_data_clean), axis = 1)
+
+    #add a column 'amenities_score' based on the number of different amenities nearby
+    listings_data_clean['amenities_score'] = listings_data_clean['num_amenities_nearby'].apply(lambda x : ameneties_score(x))
+
+    #sort based on amenities score
+    listings_data_clean.sort_values(['amenities_score'], ascending = [False], inplace = True)
     print(listings_data_clean)
 
 if __name__ == "__main__":
