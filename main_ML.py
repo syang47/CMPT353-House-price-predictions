@@ -115,7 +115,7 @@ def find_best_listing():
 
 def clean_data_ML(listings_data):
     
-    columns_needed = ['host_response_time', 'host_response_rate', 'host_acceptance_rate','host_is_superhost','host_listings_count', 'host_total_listings_count', 'host_identity_verified','neighbourhood_cleansed', 'property_type', 'room_type', 'accommodates', 'bedrooms', 'beds', 'amenities', 'price',   'minimum_nights', 'maximum_nights', 'maximum_nights_avg_ntm',  'availability_30', 'availability_60', 'availability_90','availability_365','number_of_reviews', 'review_scores_rating', 'review_scores_accuracy', 'review_scores_cleanliness', 'review_scores_checkin','review_scores_communication','review_scores_location','review_scores_value', 'reviews_per_month' ]
+    columns_needed = ['latitude', 'longitude', 'host_response_time', 'host_response_rate', 'host_acceptance_rate','host_is_superhost','host_listings_count', 'host_total_listings_count', 'host_identity_verified','neighbourhood_cleansed', 'property_type', 'room_type', 'accommodates', 'bedrooms', 'beds', 'amenities', 'price',   'minimum_nights', 'maximum_nights', 'maximum_nights_avg_ntm',  'availability_30', 'availability_60', 'availability_90','availability_365','number_of_reviews', 'review_scores_rating', 'review_scores_accuracy', 'review_scores_cleanliness', 'review_scores_checkin','review_scores_communication','review_scores_location','review_scores_value', 'reviews_per_month' ]
     listings_data = listings_data[columns_needed]
 
     # remove all rows with any Null Value
@@ -143,8 +143,10 @@ def clean_data_ML(listings_data):
 def run_ml():
     listings_data, amenities_data = read_data()
     listings_data_clean = clean_data_ML(listings_data)
+    amenities_required = ['restaurant', 'fast_food', 'cafe','bank','atm','pharmacy','bicycle_rental','fuel','pub','bar','car_sharing','car_rental','clinic','doctors','hospital','ice_cream','fountain','theatre','police','bus_station']
+    amenities_data_clean = clean_amenities_data(amenities_data, amenities_required)
 
-    print(listings_data_clean)
+    # print(listings_data_clean)
 
     X = listings_data_clean.drop('price',1)
     y = listings_data_clean['price']
@@ -162,6 +164,31 @@ def run_ml():
     gb =  GradientBoostingRegressor()
     gb.fit(X_train, y_train)    
     print("Gradient Boosting Score:",gb.score(X_valid, y_valid))
+
+    # Now we want to see if adding amenities score improves our model
+    #add a column for number of amenities nearby to each listing
+    listings_data_clean['num_amenities_nearby'] = listings_data_clean.apply(lambda x: num_amenities(x['latitude'], x['longitude'], amenities_data_clean), axis = 1)
+    
+    #add a column 'amenities_score' based on the number of different amenities nearby
+    listings_data_clean['amenities_score'] = listings_data_clean['num_amenities_nearby'].apply(lambda x : ameneties_score(x))
+    listings_data_clean = listings_data_clean.drop('num_amenities_nearby',1)
+
+    X = listings_data_clean.drop('price',1)
+    y = listings_data_clean['price']
+
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y)
+
+    knn = KNeighborsRegressor(50)
+    knn.fit(X_train, y_train)
+    print("Knn Score with ameneties_score:",knn.score(X_valid, y_valid))
+
+    rf = RandomForestRegressor(100, max_depth=40)
+    rf.fit(X_train, y_train)
+    print("Random Forest Score with amenities_score:",rf.score(X_valid, y_valid))
+
+    gb =  GradientBoostingRegressor()
+    gb.fit(X_train, y_train)    
+    print("Gradient Boosting Score with amenities_score:",gb.score(X_valid, y_valid))
 
 
 def main():
