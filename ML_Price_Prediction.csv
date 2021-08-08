@@ -1,0 +1,4 @@
+Regressors Used,AirBnb's Listing Info,AirBnb's Listing Info with Amenity Scores
+K-Nearest Neighbors,0.037784108119645055,0.06473755464183428
+Random Forest,0.4460220012264998,0.573654858125371
+Gradient Boosting,0.4603369350549257,0.5982833333099977
