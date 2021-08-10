@@ -87,6 +87,8 @@ def clean_listings_data(listings_data, accommodates_input, room_input, price_ran
     
     listings_data=listings_data.reset_index(drop=True)
     
+    # print(listings_data)
+
     return listings_data
 
 
@@ -124,10 +126,15 @@ def find_best_listing(listings_data, amenities_data, user_input1):
     
     # clean AirBnb listings data
     listings_data_clean = clean_listings_data(listings_data, accommodates_input, room_input, price_range_input, exact, amenities_data_clean)
-    
+
+    if listings_data_clean.empty:
+        return amenities_data_clean, None
+
     # sort by amenities_score in descending order, drop na scores(?)
-    listings_by_ascore = listings_data_clean.sort_values(['amenities_score'], ascending=False).dropna().reset_index(drop=True)
-    
+    listings_by_ascore = listings_data_clean.sort_values(['amenities_score'], ascending=False).reset_index(drop=True)
+    # print(listings_by_ascore)
+
+
     return amenities_data_clean, listings_by_ascore
 
 # returns cleaned listings data for ML
@@ -160,43 +167,42 @@ def clean_data_ML(listings_data):
 
 # returns the scores of different models
 def run_ml(listings_data_clean, amenities_data_clean):
-    
-    X = listings_data_clean.drop('price',1)
-    y = listings_data_clean['price']
-
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y)
-    knn = KNeighborsRegressor(n_neighbors=50)
-    knn.fit(X_train, y_train)
-    knn_sc = knn.score(X_valid, y_valid)
-    print("Knn Score:", knn_sc)
-    
-    rf = RandomForestRegressor(100, max_depth=40)
-    rf.fit(X_train, y_train)
-    rf_sc = rf.score(X_valid, y_valid)
-    print("Random Forest Score:",rf_sc)
-    
-    gb =  GradientBoostingRegressor()
-    gb.fit(X_train, y_train)    
-    gb_sc = gb.score(X_valid, y_valid)
-    print("Gradient Boosting Score:",gb_sc)
-
-    # Now we want to see if adding amenities score improves our model
+ 
     #add a column for number of amenities nearby to each listing
     listings_data_clean['num_amenities_nearby'] = listings_data_clean.apply(lambda x: num_amenities(x['latitude'], x['longitude'], amenities_data_clean), axis = 1)
     
     #add a column 'amenities_score' based on the number of different amenities nearby
     listings_data_clean['amenities_score'] = listings_data_clean['num_amenities_nearby'].apply(lambda x : ameneties_score(x))
-    listings_data_clean = listings_data_clean.drop('num_amenities_nearby',1)
-
+    listings_data_clean = listings_data_clean.drop(['num_amenities_nearby'],1)
+    
     X = listings_data_clean.drop('price',1)
     y = listings_data_clean['price']
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y)
 
+    X_train_without_amenity_score = X_train.drop('amenities_score', 1)
+    X_valid_without_amenity_score = X_valid.drop('amenities_score', 1)
+
+    knn = KNeighborsRegressor(50)
+    knn.fit(X_train_without_amenity_score, y_train)
+    knn_sc = knn.score(X_valid_without_amenity_score, y_valid)
+    print("Knn Score:", knn_sc)
+    
+    rf = RandomForestRegressor(100, max_depth=40)
+    rf.fit(X_train_without_amenity_score, y_train)
+    rf_sc = rf.score(X_valid_without_amenity_score, y_valid)
+    print("Random Forest Score:",rf_sc)
+    
+    gb =  GradientBoostingRegressor()
+    gb.fit(X_train_without_amenity_score, y_train)    
+    gb_sc = gb.score(X_valid_without_amenity_score, y_valid)
+    print("Gradient Boosting Score:",gb_sc)
+
+    # Now we want to see if adding amenities score improves our model
     knn_A = KNeighborsRegressor(50)
     knn_A.fit(X_train, y_train)
     knn_A_sc = knn_A.score(X_valid, y_valid)
-    print("Knn Score with ameneties_score:",knn_A_sc)
+    print("\nKnn Score with ameneties_score:",knn_A_sc)
 
     rf_A = RandomForestRegressor(100, max_depth=40)
     rf_A.fit(X_train, y_train)

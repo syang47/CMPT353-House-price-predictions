@@ -1,4 +1,4 @@
 accommodates: 3
-bedrooms: 2
-price range: 0-500
+bedrooms: 3
+price range: 200-500
 exact: True

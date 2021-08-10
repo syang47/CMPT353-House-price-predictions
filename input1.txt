@@ -1,4 +1,4 @@
-accommodates: 3
-bedrooms: 2
-price range: 2-100
+accommodates: 5
+bedrooms: 3
+price range: 0-100
 exact: False
