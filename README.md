@@ -17,6 +17,7 @@ The two output files ("AirBnb_search_results.csv", "ML_Price_Prediciton.csv") wi
 
 1. To find best Airbnb listings based on minimum preference requirements (exact = False):
     * python3 listings_by_amenities.py input1.txt  
+    
 
 2. To find best Airbnb listings based on exact preference requirements (exact = True):
     * python3 listings_by_amenities.py input2.txt  
