@@ -15,8 +15,8 @@ The two output files ("AirBnb_search_results.csv", "ML_Price_Prediciton.csv") wi
 
 ### Command to run the program with example inputs:
 
-1. To find best Airbnb listings based on minimum preference requirements (exact = False):  
-    * python3 listings_by_amenities.py input1.txt
+To find best Airbnb listings based on minimum preference requirements (exact = False):  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python3 listings_by_amenities.py input1.txt
 
-2. To find best Airbnb listings based on exact preference requirements (exact = True):  
-    * python3 listings_by_amenities.py input2.txt  
+To find best Airbnb listings based on exact preference requirements (exact = True):  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python3 listings_by_amenities.py input2.txt  
