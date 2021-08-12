@@ -1,5 +1,5 @@
 # CMPT 353 - OSM and Airbnb Listing
----
+
 The _listings_by_amenities.py_ is a python program that takes an input text file with user's Airbnb filtering preference in the following format:
 
 accommodates: x  
@@ -16,8 +16,8 @@ The two output files ("AirBnb_search_results.csv", "ML_Price_Prediciton.csv") wi
 ### Command to run the program with example inputs:
 
 1. To find best Airbnb listings based on minimum preference requirements (exact = False):
-    * python3 listings_by_amenities.py input1.txt  
-    
+    * python3 listings_by_amenities.py input1.txt    
+
 
 2. To find best Airbnb listings based on exact preference requirements (exact = True):
     * python3 listings_by_amenities.py input2.txt  
