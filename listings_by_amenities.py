@@ -239,7 +239,7 @@ def main(in_directory):
     else:
         best_listings = find_best_listing(listings_data_clean, amenities_data_clean)
 
-        print(best_listings)
+        # print(best_listings)
 
         best_listings.to_csv("AirBnb_search_results.csv", na_rep='(missing)')
 
